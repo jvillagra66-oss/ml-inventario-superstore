@@ -1,48 +1,74 @@
-# Proyecto de Ciencia de Datos & Machine Learning: Análisis e Inventario Superstore
+# README.md - Análisis e Inventario Superstore con Machine Learning
 
-Este repositorio contiene el desarrollo metodológico de punta a punta (*End-to-End*) para la analítica avanzada, predicción de riesgos operativos y segmentación estratégica utilizando el dataset transaccional **Superstore**.
-
-A lo largo del proyecto se implementan buenas prácticas de ingeniería de software para ciencia de datos, estructurando flujos reproducibles que transforman datos crudos en modelos predictivos y de segmentación de alto valor para el negocio.
+Este repositorio contiene el desarrollo completo del análisis exploratorio de datos (EDA), preprocesamiento y modelado predictivo utilizando el conjunto de datos **Sample Superstore**. El objetivo principal es optimizar el inventario mediante la clasificación del **Riesgo de Quiebre de Stock (Stockout Risk)** y el agrupamiento de transacciones comerciales.
 
 ---
 
-## 🚀 Estructura e Hitos del Proyecto
+## 🚀 Resumen del Proyecto y Flujo de Trabajo
 
-### 1. Carga y Limpieza de Datos
-* **Ingesta Automatizada:** Descarga del dataset de forma automática utilizando la API de `kagglehub` sin necesidad de gestionar credenciales manuales.
-* **Calidad de Datos:** Identificación y eliminación de registros 100% duplicados (reduciendo el conjunto de datos a 9,977 filas) y confirmación de la ausencia de valores nulos.
-* **Depuración:** Eliminación de variables no influyentes para optimizar la eficiencia computacional de los modelos.
-
-### 2. Análisis Exploratorio de Datos (EDA)
-* **Análisis de Distribución:** Evaluación del comportamiento de las ventas (`Sales`) y ganancias (`Profit`).
-* **Análisis de Correlación:** Mapeo de correlaciones lineales mediante mapas de calor (`seaborn`) para identificar colinealidad y relaciones clave.
-
-### 3. Ingeniería de Características (Feature Engineering)
-* **Variable Objetivo Binaria (`Stockout_Risk`):** Creación del target predictivo para identificar transacciones críticas que demandan altos volúmenes de productos (`Quantity > 3`), asociándolas al riesgo operativo de quiebre de stock.
-* **Escalado de Datos:** Normalización y estandarización de las variables numéricas financieras continuas usando `MinMaxScaler` y `StandardScaler`.
-* **Codificación Categórica:** Transformación robusta de variables cualitativas (`Ship Mode`, `Region`, `Category`) mediante técnicas de *One-Hot Encoding* (`get_dummies` y `OneHotEncoder`).
-
-### 4. Modelado Predictivo Supervisado
-* **Regresión Lineal e Interactividad:** Ajuste de modelos numéricos continuos acompañados de simuladores visuales interactivos con `ipywidgets` para entender la relación ventas-ganancias.
-* **Clasificación Tradicional (KNN & Regresión Logística):** Análisis detallado de matrices de confusión y calibración del umbral de decisión (reajustado a `0.47`) para mejorar la sensibilidad en la detección del riesgo.
-* **Árboles de Decisión:** Análisis empírico del sobreajuste (*Overfitting*) mediante la comparación de un árbol podado (`max_depth=3`) frente a uno completo. También se abordó la clasificación multiclase (3 categorías de productos) evaluada con matrices de confusión de 3x3.
-* **Modelos de Ensamble (Random Forest):** Entrenamiento de bosques aleatorios (`RandomForestClassifier`) y análisis de la estabilización del error en función de la cantidad de estimadores.
-
-### 5. Pipelines Automatizados y Optimización
-* **Pipelines de Scikit-Learn:** Automatización del flujo de trabajo uniendo etapas de imputación con `SimpleImputer`, escalado con `StandardScaler` y el estimador final.
-* **Validación Cruzada Estratificada:** Evaluación estadística del modelo mediante *5-Fold Stratified Cross-Validation* para asegurar la capacidad de generalización.
-* **Búsqueda en Grilla (GridSearchCV):** Optimización sistemática de hiperparámetros que determinó que el mejor modelo es un **Random Forest** con `max_depth=20` y `n_estimators=100`, alcanzando una **exactitud final del 74.0%** en el conjunto de prueba.
-
-### 6. Aprendizaje No Supervisado (Segmentación Estratégica)
-* **Clustering K-Means:** Agrupación de transacciones basándose puramente en patrones financieros de ventas y ganancias.
-* **Selección Matemática de K:** Identificación del número óptimo de segmentos ($k=5$) a través del **Método del Codo (Inercia)** y la métrica del **Coeficiente de Silhouette**.
-* **Perfilamiento de Clústeres:** Caracterización operativa de cada uno de los 5 grupos e integración con el análisis supervisado para determinar la tasa real de riesgo de quiebre de stock por segmento (revelando que el Clúster 3 presenta una tasa crítica del **92.3%**).
+### 1. Preparación y Limpieza de Datos
+* **Carga de datos:** Descarga automática usando `kagglehub`.
+* **Tratamiento de duplicados:** Detección y eliminación de 17 registros idénticos.
+* **Ingeniería de variables:**
+  * Creación de la variable objetivo binaria `Stockout_Risk` (1 si `Quantity > 3`, de lo contrario 0).
+  * Normalización de variables continuas (`Sales`, `Profit`) utilizando `MinMaxScaler` y `StandardScaler`.
+  * Codificación de variables categóricas (`Ship Mode`, `Region`, `Category`) mediante One-Hot Encoding.
 
 ---
 
-## 🛠️ Requisitos Técnicos
+## 📊 Modelos Entrenados y Rendimiento
 
-Para reproducir este proyecto, asegúrate de instalar las siguientes dependencias:
+### A. Modelos Supervisados (Clasificación de Riesgo de Stockout)
+Se dividieron los datos utilizando una partición estratificada de **80% Entrenamiento / 20% Prueba** para garantizar la representatividad.
 
-```bash
-pip install pandas numpy matplotlib seaborn scikit-learn kagglehub ipywidgets
+1. **Regresión Logística con Umbrales de Decisión:**
+   * **Umbral por defecto (50%):** Accuracy del 61%. Alta precisión para la clase de riesgo (83%), pero bajo recall (10%).
+   * **Umbral optimizado (47%):** Incrementó la sensibilidad para detectar situaciones de riesgo, aumentando el recall al 15%.
+
+2. **K-Vecinos Más Cercanos (KNN):**
+   * Evaluado con $K=5$ vecinos.
+   * **Accuracy Global:** 0.66.
+
+3. **Árbol de Decisión (Control de Sobreajuste):**
+   * **Árbol Completo (Sin Podar):** Demostró overfitting extremo con un 100% de exactitud en el set de entrenamiento frente a un 69.6% en test.
+   * **Árbol Podado (`max_depth=3`):** Se controló el sobreajuste obteniendo una exactitud equilibrada del **65.1%** tanto en entrenamiento como en pruebas.
+
+4. **Random Forest Classifier (Ensamble):**
+   * Se analizó la estabilización del error variando el número de estimadores.
+   * Identificación de las variables más influyentes mediante **Importancia por Permutación**, destacando a `Sales` y `Profit` como los factores clave para la clasificación.
+
+---
+
+## 🛠️ Optimización y Automatización (Pipeline & GridSearchCV)
+
+Para consolidar las buenas prácticas en Machine Learning, se implementó un **Pipeline automatizado** integrado por:
+1. **Imputación:** Reemplazo de nulos mediante mediana con `SimpleImputer`.
+2. **Escalado:** Estandarización con `StandardScaler`.
+3. **Clasificador:** Ajuste dinámico de algoritmos.
+
+### Resultados de la Búsqueda en Grilla (GridSearchCV):
+Se evaluaron arquitecturas competitivas de Regresión Logística y Random Forest utilizando validación cruzada de 5 pliegues (`cv=5`).
+
+* **Mejor Modelo Seleccionado:** `RandomForestClassifier`
+* **Hiperparámetros óptimos:** `max_depth: 20`, `n_estimators: 100`
+* **Métricas de Éxito:**
+  * **Exactitud promedio en CV (5-fold):** **72.7%**
+  * **Exactitud (Accuracy) final en pruebas:** **74.0%**
+
+--- 
+
+## 🎯 Segmentación No Supervisada (K-Means Clustering)
+
+Se aplicó clustering no supervisado en base a `Sales` y `Profit` para perfilar las transacciones comerciales:
+* **Evaluación del K Óptimo:** Se analizó el método del codo (Inercia) y el coeficiente de Silhouette, determinando que **$K=5$** proporciona la mejor cohesión y separación de clusters.
+* **Perfilamiento de Clústeres:**
+  * **Grupo con mayor tasa de Riesgo de Stockout:** El Clúster 3 cuenta con una tasa de riesgo crítica del **92.3%**, asociado a transacciones de alto volumen de ventas con margen negativo.
+  * **Grupo con menor tasa de Riesgo:** El Clúster 0 representa transacciones estándar con un **40.6%** de probabilidad de riesgo de quiebre.
+
+---
+
+## 🛠️ Tecnologías Utilizadas
+* **Python 3**
+* **Pandas / NumPy** (Manipulación de datos)
+* **Scikit-Learn** (Pipelines, Modelado, Métricas y Selección de Modelos)
+* **Matplotlib / Seaborn** (Visualización interactiva y mapas de calor)
