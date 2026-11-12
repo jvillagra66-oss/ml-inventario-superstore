@@ -1,48 +1,44 @@
-# Proyecto de Ciencia de Datos & Machine Learning: Análisis e Inventario Superstore
+ 🛒 Proyecto de Machine Learning & Clustering: Superstore
 
-Este repositorio contiene el desarrollo metodológico de punta a punta (*End-to-End*) para la analítica avanzada, predicción de riesgos operativos y segmentación estratégica utilizando el dataset transaccional **Superstore**.
-
-A lo largo del proyecto se implementan buenas prácticas de ingeniería de software para ciencia de datos, estructurando flujos reproducibles que transforman datos crudos en modelos predictivos y de segmentación de alto valor para el negocio.
+Este repositorio contiene el flujo de trabajo completo para el análisis exploratorio, modelado predictivo de riesgo de stock y segmentación de clientes/operaciones utilizando el conjunto de datos de transacciones de **Superstore**.
 
 ---
 
-## 🚀 Estructura e Hitos del Proyecto
+## 📋 Resumen del Proyecto
+El objetivo principal es implementar modelos de **Aprendizaje Supervisado** y **No Supervisado** para optimizar la toma de decisiones comerciales, enfocándose en la prevención de quiebres de inventario (Stockout) y la caracterización del comportamiento financiero de las transacciones.
 
-### 1. Carga y Limpieza de Datos
-* **Ingesta Automatizada:** Descarga del dataset de forma automática utilizando la API de `kagglehub` sin necesidad de gestionar credenciales manuales.
-* **Calidad de Datos:** Identificación y eliminación de registros 100% duplicados (reduciendo el conjunto de datos a 9,977 filas) y confirmación de la ausencia de valores nulos.
-* **Depuración:** Eliminación de variables no influyentes para optimizar la eficiencia computacional de los modelos.
-
-### 2. Análisis Exploratorio de Datos (EDA)
-* **Análisis de Distribución:** Evaluación del comportamiento de las ventas (`Sales`) y ganancias (`Profit`).
-* **Análisis de Correlación:** Mapeo de correlaciones lineales mediante mapas de calor (`seaborn`) para identificar colinealidad y relaciones clave.
-
-### 3. Ingeniería de Características (Feature Engineering)
-* **Variable Objetivo Binaria (`Stockout_Risk`):** Creación del target predictivo para identificar transacciones críticas que demandan altos volúmenes de productos (`Quantity > 3`), asociándolas al riesgo operativo de quiebre de stock.
-* **Escalado de Datos:** Normalización y estandarización de las variables numéricas financieras continuas usando `MinMaxScaler` y `StandardScaler`.
-* **Codificación Categórica:** Transformación robusta de variables cualitativas (`Ship Mode`, `Region`, `Category`) mediante técnicas de *One-Hot Encoding* (`get_dummies` y `OneHotEncoder`).
-
-### 4. Modelado Predictivo Supervisado
-* **Regresión Lineal e Interactividad:** Ajuste de modelos numéricos continuos acompañados de simuladores visuales interactivos con `ipywidgets` para entender la relación ventas-ganancias.
-* **Clasificación Tradicional (KNN & Regresión Logística):** Análisis detallado de matrices de confusión y calibración del umbral de decisión (reajustado a `0.47`) para mejorar la sensibilidad en la detección del riesgo.
-* **Árboles de Decisión:** Análisis empírico del sobreajuste (*Overfitting*) mediante la comparación de un árbol podado (`max_depth=3`) frente a uno completo. También se abordó la clasificación multiclase (3 categorías de productos) evaluada con matrices de confusión de 3x3.
-* **Modelos de Ensamble (Random Forest):** Entrenamiento de bosques aleatorios (`RandomForestClassifier`) y análisis de la estabilización del error en función de la cantidad de estimadores.
-
-### 5. Pipelines Automatizados y Optimización
-* **Pipelines de Scikit-Learn:** Automatización del flujo de trabajo uniendo etapas de imputación con `SimpleImputer`, escalado con `StandardScaler` y el estimador final.
-* **Validación Cruzada Estratificada:** Evaluación estadística del modelo mediante *5-Fold Stratified Cross-Validation* para asegurar la capacidad de generalización.
-* **Búsqueda en Grilla (GridSearchCV):** Optimización sistemática de hiperparámetros que determinó que el mejor modelo es un **Random Forest** con `max_depth=20` y `n_estimators=100`, alcanzando una **exactitud final del 74.0%** en el conjunto de prueba.
-
-### 6. Aprendizaje No Supervisado (Segmentación Estratégica)
-* **Clustering K-Means:** Agrupación de transacciones basándose puramente en patrones financieros de ventas y ganancias.
-* **Selección Matemática de K:** Identificación del número óptimo de segmentos ($k=5$) a través del **Método del Codo (Inercia)** y la métrica del **Coeficiente de Silhouette**.
-* **Perfilamiento de Clústeres:** Caracterización operativa de cada uno de los 5 grupos e integración con el análisis supervisado para determinar la tasa real de riesgo de quiebre de stock por segmento (revelando que el Clúster 3 presenta una tasa crítica del **92.3%**).
+### 🛠️ Tecnologías y Librerías Utilizadas
+* **Manipulación de Datos:** `pandas`, `numpy`
+* **Visualización:** `matplotlib`, `seaborn`
+* **Modelado Predictivo (ML):** `scikit-learn`
+* **Descarga Automática de Datos:** `kagglehub`
 
 ---
 
-## 🛠️ Requisitos Técnicos
+## 🔄 Fases de Implementación e Hitos Recientes
 
-Para reproducir este proyecto, asegúrate de instalar las siguientes dependencias:
+### 1. Extracción e Ingeniería de Datos (ETL)
+* **Ingesta Automatizada:** Configuración con la API de `kagglehub` para descargar de manera segura el dataset *Sample-Supermarket*.
+* **Limpieza Extrema:** Identificación y remoción exitosa de registros 100% duplicados, restableciendo los índices de manera continua.
+* **Selección de Características:** Eliminación estratégica de dimensiones de alta cardinalidad (IDs de órdenes, nombres de clientes) y variables irrelevantes para prevenir ruido en los modelos.
 
-```bash
-pip install pandas numpy matplotlib seaborn scikit-learn kagglehub ipywidgets
+### 2. Modelado de Clasificación (Riesgo de Quiebre de Stock)
+Se construyó una variable binaria objetivo llamada `Stockout_Risk` (donde `1` representa una demanda alta de artículos `Quantity > 3` y `0` representa un comportamiento normal).
+* **Regresión Logística:** Evaluación del rendimiento con umbrales por defecto (50%) y calibración personalizada mediante probabilidad predictiva (47%) para ajustar la sensibilidad del negocio.
+* **K-Nearest Neighbors (KNN):** Entrenamiento interactivo con ajuste dinámico de vecinos ($K$).
+* **Árboles de Decisión:** Demostración práctica de control de sobreajuste comparando un árbol con profundidad máxima libre (Overfitting al 100% en Train) versus un árbol podado (`max_depth=3`).
+* **Random Forest:** Ensamble de 100 estimadores analizando su curva de estabilización en precisión.
+
+### 3. Diagnóstico Avanzado de Modelos
+* **Permutation Importance:** Implementación de análisis por permutación tanto en el set de Entrenamiento como de Prueba para medir la robustez, estabilidad e impacto real de las variables (`Sales` y `Profit` como las de mayor impacto).
+
+### 4. Segmentación Estratégica (Clustering No Supervisado)
+* **Normalización:** Uso de `StandardScaler` en las variables continuas financieras para evitar distorsiones por escalas.
+* **Selección de $k$ Óptimo:** Evaluación del método del codo (Inercia) y Coeficiente de Silueta (`Silhouette Score`) determinando **$k=5$** como la agrupación más equilibrada.
+* **Perfilado de Clústeres:** 
+  * Identificación de grupos de bajo valor, transacciones masivas de alto margen, y operaciones críticas con pérdidas financieras.
+  * Cálculo de la **Tasa de Riesgo de Stockout** por grupo, revelando que el clúster de compras corporativas masivas tiene hasta un **92.3%** de probabilidad de quiebre de stock.
+
+### 5. Automatización de Flujos (Pipelines & AutoML)
+* **Pipeline Robusto:** Construcción de un objeto `Pipeline` de `scikit-learn` que encadena la imputación mediana (`SimpleImputer`), el escalado (`StandardScaler`) y el modelo clasificador en un único flujo blindado contra fugas de datos (Data Leakage).
+* **GridSearchCV:** Búsqueda sistemática del mejor estimador e hiperparámetros óptimos entre algoritmos competidores, logrando una precisión final del **74.0%** en el conjunto de prueba usando `RandomForestClassifier(max_depth=20, n_estimators=100)`.
