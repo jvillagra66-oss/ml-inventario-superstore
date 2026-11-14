@@ -1,4 +1,4 @@
-eadme_content = """# Proyecto de Ciencia de Datos & Machine Learning: Análisis e Inventario Superstore
+readme_content = """# Proyecto de Ciencia de Datos & Machine Learning: Análisis e Inventario Superstore
 
 Este repositorio contiene el flujo de trabajo completo para el análisis de transacciones, segmentación de clientes y predicción del riesgo de desabastecimiento (*Stockout Risk*) utilizando un dataset de **Kaggle** de una tienda minorista (*Superstore*).
 
